@@ -1,0 +1,136 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="MasterPage.master.cs" Inherits="MasterPage" %>
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+   <head runat="server">
+      <meta charset="utf-8">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Midnight Cruises</title>
+
+      <!-- Bootstrap -->
+      <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+      
+      <link href="css/queries.css" rel="stylesheet" />
+      <link href="css/main.css" rel="stylesheet" type="text/css">
+
+      <link href="https://fonts.googleapis.com/css?family=Crimson+Text|Montserrat" rel="stylesheet">
+
+      <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+      <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+      <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+      <![endif]-->
+
+      <asp:ContentPlaceHolder id="head" runat="server">
+      </asp:ContentPlaceHolder>
+   </head>
+
+   <body>
+      <form id="form1" runat="server">
+
+         <nav class="navbar navbar-default">
+            <div class="container-fluid">
+               <div class="navbar-header">
+                  <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                     <span class="icon-bar"></span>
+                  </button>    
+               </div>
+               <div class="navbar-brand">
+                  <a href="/">
+                     <p>Midnight Cuises</p>
+                  </a>
+               </div>
+               <div class="navbar-collapse collapse">
+                  <asp:Menu ID="Menu1" runat="server" 
+                  CssClass="main_menu navbar-right" 
+                  DataSourceID="SiteMapDataSource1" 
+                  Orientation="Horizontal" 
+                  StaticDisplayLevels="2">
+                  </asp:Menu>
+                  <asp:SiteMapDataSource ID="SiteMapDataSource1" runat="server" />
+               </div>
+            </div>
+         </nav>
+
+         <header>
+            <div class="text-center text-header t-shadow">
+               <h1>Midnight Cruises</h1>
+               <p>Båtforeningen for alle som elsker båt!</p>
+            </div>
+         </header>
+
+         <div class="container-fluid">
+            <main>
+               <asp:ContentPlaceHolder id="ContentPlaceHolder1" runat="server">
+        
+               </asp:ContentPlaceHolder>
+
+               <hr />
+
+               <section>
+                  <h3>Sjekk ut de 5 neste utfluktene:</h3>
+                  <asp:DataList ID="DataList1" runat="server"
+                     CssClass="row" 
+                     DataKeyField="excursion_ID" 
+                     DataSourceID="mcExcursions5" 
+                     RepeatDirection="Horizontal" 
+                     RepeatLayout="Flow"
+                     OnItemDataBound="DataList1_ItemDataBound">
+                     <ItemStyle CssClass="col-1-5 excursion-holder t-shadow"/>
+                     <ItemTemplate>
+                        <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl='<%# Eval("excursion_ID", "~/default.aspx?ID={0}") %>'>
+                           <h3>
+                           <asp:Label ID="destinationLabel" runat="server" CssClass="u5-head" Text='<%# Eval("destination") %>' />
+                           </h3>
+                           <asp:Label ID="excursion_nameLabel" runat="server" Text='<%# Eval("excursion_name") %>' />
+                           <br />
+                           <br />
+                           <asp:Label ID="excursion_dateLabel" runat="server" Text='<%# Eval("excursion_date", "{0:d}") %>' />
+                           <br />
+                           <asp:Label ID="durationLabel" runat="server" Text='<%# Eval("duration") %>' />
+                           <span>Dager</span>
+                           <br />
+                           <br />
+                           <asp:Label ID="priceLabel" runat="server" CssClass="u5-price" Text='<%# Eval("price", "{0:c0}") %>' />
+                           <br />
+                        </asp:HyperLink>
+                     </ItemTemplate>
+                  </asp:DataList>
+
+                  <asp:SqlDataSource ID="mcExcursions5" runat="server" 
+                     ConnectionString="<%$ ConnectionStrings:ConnectionString %>" 
+                     SelectCommand="
+                     SELECT TOP 5 excursions.excursion_ID, destinations.destination, excursions.excursion_name, excursions.excursion_date, excursions.duration, excursions.price
+                     FROM destinations
+                     INNER JOIN excursions_destinations ON destinations.destination_ID = excursions_destinations.destination_ID 
+                     INNER JOIN excursions ON excursions_destinations.excursion_ID = excursions.excursion_ID
+                     WHERE excursions.excursion_date > GetDate() ORDER BY excursions.excursion_date">
+                  </asp:SqlDataSource>
+
+               </section>
+
+            </main>
+         </div>
+
+         <hr /> 
+
+         <footer>
+            <p class="text-center">Midnight Cruises 2016</p>
+         </footer>
+
+      </form>
+
+      <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+      <script src="<%= ResolveUrl("~/bootstrap/js/jquery-1.9.1.min.js") %>"></script>
+      <!-- Include all compiled plugins (below), or include individual files as needed -->
+      <script src="<%= ResolveUrl("~/bootstrap/js/bootstrap.min.js") %>"></script>
+
+      <script src="<%= ResolveUrl("~/js/script.js") %>"></script>
+
+   </body>
+</html>
