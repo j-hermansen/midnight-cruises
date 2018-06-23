@@ -1,0 +1,214 @@
+﻿CREATING DATABASE
+
+CREATE DATABASE midnightCruises
+GO
+USE midnightCruises
+GO
+
+CREATE TABLE excursions 
+(
+excursion_ID			int not null PRIMARY KEY IDENTITY(1,1),
+boat_ID					int not null,
+excursion_name			varchar(255) not null,
+excursion_date			datetime,
+duration				int,
+price					money DEFAULT 0,
+excursion_description 	varchar(MAX),
+registered_date			datetime  not null DEFAULT GETDATE(), 
+url						varchar(255),
+active					bit DEFAULT 1,
+food					bit DEFAULT 0
+)
+
+CREATE TABLE excursion_images 
+(
+image_ID				int not null PRIMARY KEY IDENTITY(1,1),
+excursion_ID			int not null,
+excursion_image 		varchar(255)
+)
+
+CREATE TABLE boats 
+(
+boat_ID					int not null PRIMARY KEY IDENTITY(1,1),
+boat_name				varchar(255) not null,
+foot					int,
+boat_year				int,
+capacity				int,
+boat_owner				varchar(255)
+)
+
+CREATE TABLE boat_images 
+(
+image_ID				int not null PRIMARY KEY IDENTITY(1,1),
+boat_ID					int not null,
+boat_image 				varchar(255)
+)
+
+CREATE TABLE excursions_destinations
+(
+excursion_ID			int not null,
+destination_ID			int not null
+)
+
+CREATE TABLE destinations 
+(
+destination_ID			int not null PRIMARY KEY IDENTITY(1,1),
+destination				varchar(255)
+)
+
+CREATE TABLE sign_ups 
+(
+sign_up_ID				int PRIMARY KEY IDENTITY(1,1) not null,
+excursion_ID			int not null,
+sign_up_user			varchar(255) not null,
+registered_date			datetime not null DEFAULT GETDATE()
+paid					bit DEFAULT 0,
+sign_up_tex				varchar(MAX)
+)
+
+GO
+
+--Midnight Cruises FK constraints
+
+ALTER TABLE excursions ADD CONSTRAINT fk_excursions_boats FOREIGN KEY (boat_ID) REFERENCES boats (boat_ID)
+ALTER TABLE excursion_images ADD CONSTRAINT fk_excursionsimages_excursions FOREIGN KEY (excursion_ID) REFERENCES excursions (excursion_ID)
+ALTER TABLE boat_images ADD CONSTRAINT fk_boatsimages_boats FOREIGN KEY (boat_ID) REFERENCES boats (boat_ID)
+ALTER TABLE excursions_destinations ADD CONSTRAINT fk_excursions_destinations FOREIGN KEY (excursion_ID) REFERENCES excursions (excursion_ID)
+ALTER TABLE excursions_destinations ADD CONSTRAINT fk_destinations_excursions FOREIGN KEY (destination_ID) REFERENCES destinations (destination_ID)
+ALTER TABLE sign_ups ADD CONSTRAINT sign_up_excursions FOREIGN KEY (excursion_ID) REFERENCES excursions (excursion_ID)
+
+
+--Tillater kun 50 fot eller mer.
+
+ALTER TABLE boats
+ADD CONSTRAINT foot
+CHECK (foot>= 50)
+
+GO
+
+
+GO
+
+--// Referanser fra finn.no
+INSERT INTO boats (boat_name, foot, boat_year, capacity, boat_owner) VALUES 
+('Fairline Squadron', 55, 1999, 50, 'toresen'),
+('Windy', 58, 2004, 60, 'toresen'),
+('Sunseeker', 62, 1998, 60, 'ingeo'),
+('Explorer', 54, 2017, 45, 'knut69'),
+('GALEON', 72, 2017, 65, 'philip1960')
+
+GO
+
+--Referanser fra http://reisetips.nettavisen.no/norges-20-heteste-sommerbyer/
+INSERT INTO excursions (boat_ID, excursion_name, excursion_date, duration, price, excursion_description, url, active, food) VALUES
+(
+	1, 
+	'Tur til Stavern', 
+	CAST('20170723' AS datetime),
+	3, 
+	600, 
+	'Stavern i Vestfold det stedet med flest soldager i året her hjemme. Stavern eller «Kunstneres by» har bevart sitt sjarmerende særpreg med smågater og eldre trehus, 
+		og har flere strender, kystnære naturområder og historiske ruiner.',
+	'www.stavern.no',
+	1,
+	1
+),
+(
+	2, 
+	'Skottevik og Kristiansand!', 
+	CAST('20170516' AS datetime), 
+	1, 
+	1000, 
+	'En idyllisk storby med småbysjarm!',
+	'www.kristiansand.no',
+	1,
+	0
+),
+(
+	3, 
+	'Skudeneshavn', 
+	CAST('20150903' AS datetime), 
+	6, 
+	1000, 
+	'Skudeneshavn ble bygget opp på hummer- og sildefiske, og på midten av 1800-tallet var det travle tider.',
+	'www.skudeneshavn.no',
+	1,
+	1
+),
+(
+	4, 
+	'Gamlebyen i Fredrikstad', 
+	CAST('20170523' AS datetime),
+	3, 
+	1200, 
+	'Gamlebyen, Nord- Europas best bevarte festningsby er et område du ikke kommer utenom om du er i Fredrikstad.',
+	'www.gamblebyen.no',
+	1,
+	1
+),
+(
+	2, 
+	'Tønsberg, norges eldste by.', 
+	CAST('20170601' AS datetime),
+	2, 
+	450, 
+	'Det som kan sies er at Tønsberg er den klassiske sommerbyen, med et yrende liv på brygga og i farvannene utenfor.',
+	'www.tonsberg.no',
+	1,
+	0
+),
+(
+	5, 
+	'Oslo, opplev Norges hovedstad', 
+	CAST('20170614' AS datetime),
+	1, 
+	250, 
+	'Oslo er en vakker by om sommeren, grønn og livlig. Skal du velge to steder å være, så er det Tjuvholmen ved Vika og Vulkan-området ved Akerselva.',
+	'www.oslo.no',
+	1,
+	1
+),
+(
+	1, 
+	'Kragerø', 
+	CAST('20160614' AS datetime),
+	2, 
+	900, 
+	'Kragerø eller perlen blant kystbyene ligger helt syd i Telemark, og det er nettopp her den fantastiske Sørlandskysten begynner.',
+	'www.kragero.no',
+	0,
+	1
+)
+
+
+GO
+
+INSERT INTO destinations (destination) VALUES 
+('Stavern'),
+('Kristiansand'),
+('Skudeneshavn'),
+('Skottevik’),
+(‘Fredrikstad’),
+('Tønsberg’),
+('Oslo'),
+('Kragerø')
+
+GO
+
+INSERT INTO excursions_destinations (excursion_ID, destination_id) VALUES 
+(1, 1),
+(2, 2),	
+(3, 3),
+(4, 5),
+(5, 6),
+(6, 7),
+(7, 8)
+
+GO
+
+INSERT INTO sign_ups (excursion_ID, sign_up_user) VALUES 
+(1, 'toresen'),
+(1, 'ingeo'),
+(3, 'toresen'),	
+(2, 'philip1960')
+
